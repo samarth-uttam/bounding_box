@@ -9,59 +9,7 @@ import sympy as sym
 import delete_duplicate_edges
 
 
-def homogenous_rotation_matrix(old_fr, new_fr):
-    # old_unit = [list((old_frame[0] / np.linalg.norm(old_frame[0]))), list(old_frame[1] / np.linalg.norm(old_frame[1])),
-    #             list(old_frame[2] / np.linalg.norm(old_frame[2]))]
-    # new_unit = [list((new_frame[0] / np.linalg.norm(new_frame[0]))), list(new_frame[1] / np.linalg.norm(new_frame[1])),
-    #             list(new_frame[2] / np.linalg.norm(new_frame[2]))]
-
-    old_x, old_y, old_z = old_fr
-    new_x, new_y, new_z = new_fr
-
-    r11 = np.dot(new_x, old_x)
-    r21 = np.dot(new_x, old_y)
-    r31 = np.dot(new_x, old_z)
-    r12 = np.dot(new_y, old_x)
-    r22 = np.dot(new_y, old_y)
-    r32 = np.dot(new_y, old_z)
-    r13 = np.dot(new_z, old_x)
-    r23 = np.dot(new_z, old_y)
-    r33 = np.dot(new_z, old_z)
-
-    rot = np.array([[r11, r12, r13],
-                    [r21, r22, r23],
-                    [r31, r32, r33],
-                    ])
-    # a = abs(np.dot(old_frame[0], old_frame[1]))
-    # b = abs(np.dot(old_frame[1], old_frame[2]))
-    # c = abs(np.dot(old_frame[2], old_frame[0]))
-    #
-    # d = abs(np.dot(new_frame[0], new_frame[1]))
-    # e = abs(np.dot(new_frame[1], new_frame[2]))
-    # f = abs(np.dot(new_frame[2], new_frame[1]))
-    # print(a, b, c, d, e, f)
-    # diff = 0.00001
-    # if a < diff or b < diff or c < diff or d < diff or e < diff or f < diff:
-    #     return 'vectors not orthogonal'
-    # else:
-    return rot
-
-
-def homogenous_translation(old_org, new_org, p):
-    final_point = []
-    del_x = new_org[0] - old_org[0]
-    del_y = new_org[1] - old_org[1]
-    del_z = new_org[2] - old_org[2]
-
-    new_x = p[0] + del_x
-    new_y = p[1] + del_y
-    new_z = p[2] + del_z
-
-    final_point = [new_x, new_y, new_z]
-
-    return final_point
-
-
+                                                                                                                                    # read the excel file and 
 
 xy_to_uv_file =  "C:/Users/Samarth/OneDrive - HKUST Connect/Thesis Project/IEDA/march/8/bunny.xls"
 b = pd.read_excel(xy_to_uv_file)
@@ -94,7 +42,7 @@ for s in hull.simplices:
 # print(len(hull.simplices))
 orig_edge_pair = []
 
-#  getting the edge pairs (taking 3 points on simplices and making 3 edges for each)
+                                                                                        #  getting the edge pairs (taking 3 points on simplices and making 3 edges for each)
 
 for i in range(len(hull.simplices)):
     p1 = hull.simplices[i][0]
@@ -113,10 +61,12 @@ for i in range(len(hull.simplices)):
 # print(len(edge_pair))
 
 print(len(orig_edge_pair))
+
+                                                                                                                                        # deleting the duplicate edge pairs 
 edge_pair = delete_duplicate_edges.duplicate_edge_remover(orig_edge_pair)
 
 print(len(edge_pair))
-# getting the circle points on xy plane at increment of 1 degree each at a unit distance from origin
+                                                                            # getting the circle points on xy plane at increment of 1 degree each at a unit distance from origin
 print(edge_pair)
 
 circle_points = []
@@ -134,8 +84,9 @@ for i in range(180):
     circle_points.append(current_xy)
 # print(circle_points)
 
-
-pair = []
+                                                                                       # for every  first edge edge get the plane whose [n = e1_p1- e2_p2 and point is e1_p1]
+    
+pair = []                                                                           
 for edge_1 in range(len(edge_pair)):
     # print(edge_pair[edge_1])
     e1_p1 = hull.points[edge_pair[edge_1][0]]
@@ -155,6 +106,7 @@ for edge_1 in range(len(edge_pair)):
     plane_eq = [coff_a, coff_b, coff_c, coff_d]
     # print('plane')
     # print(plane_eq)
+                                                                                                                                    # getting a point on the plane         
     if coff_c ==0:
 
         phi = -1 * (coff_b/coff_a)
@@ -172,7 +124,7 @@ for edge_1 in range(len(edge_pair)):
     b = new_point[0]*coff_a + new_point[1]*coff_b + new_point[2]*coff_c + coff_d
     # print(new_point)
     # print(b)
-
+                                                                                                                #  making xyz unit exis vectors for transformation matrix 
     x_new = p_0 - original_point
     x_new_unit = x_new / np.linalg.norm(x_new)
     z_new = [coff_a, coff_b, coff_c]
@@ -191,7 +143,7 @@ for edge_1 in range(len(edge_pair)):
 
     # print(old_frame, new_frame, old_origin, new_origin)
 
-    #  converting xy plane 3d points to current plane points with new origin and new frame
+                                                                  #  trnsforming xy plane 2d points to  new origin and new frame (frame is above made and origin is E1_p1)
 
     curr_rotation_matrix = homogenous_rotation_matrix(old_frame, new_frame)
 
@@ -220,7 +172,10 @@ for edge_1 in range(len(edge_pair)):
 
     # make a plane passing through point from circle projection and 2 other points of the original edge
 
-
+                                                                        
+        
+                                                                                                    #              for one edge we got the initial plane and circle points 
+                                                                                                    #             take next edge (e2 with e2p1 and e2p2)
     for edge_2 in range(len(edge_pair)):
         if edge_pair[edge_1][0] == edge_pair[edge_2][0] or edge_pair[edge_1][0] == edge_pair[edge_2][1] or edge_pair[edge_1][1] == edge_pair[edge_2][0] or edge_pair[edge_1][1] == edge_pair[edge_2][1]:
             some_value = 0
@@ -233,6 +188,7 @@ for edge_1 in range(len(edge_pair)):
             plane_2 = []
             distance_p2 = []
             dist_e_p = []
+                                                                            # from e1p1 and e1p2 and circle point (0 degree to 179 degree): make a plane parallel from e2p1 and save its distance from e2p2              
             for i3 in range(len(rot_trans_c_points)):
                 e1p3 = rot_trans_c_points[i3]
 
@@ -268,12 +224,14 @@ for edge_1 in range(len(edge_pair)):
             min_d = min(distance_p2)
             # print(min_d)
             angle = distance_p2.index(min(distance_p2))
-
+                                                                                #      for all 180 rotations via e1 and e2 get the angle that satifies both the edges (2 parallel planes contaiining (e1p1, e1p1) and (e2p2, e2p2)
             front_plane = plane_1[angle]
             back_plane = plane_2[angle]
-
+                                        
             p1 = []
             p2 = []
+            
+                                                                                    #    check if all points lie in between , if yyes save the details and go to next edge          
             for n in range(len(hull.points)):
 
                 if n == p2_count:
@@ -307,11 +265,12 @@ for edge_1 in range(len(edge_pair)):
                 print(curr)
                 pair.append(curr)
                 print('pair found')
-            # print('one second edged one ')
+            print('one second edged done .............................................................................................................................')
             # print(edge1, edge2 )
-    print('one edge donee.........................................................................................................................................')
+    print('one first edge donee.........................................................................................................................................')
     print(edge_1)
 print(pair)
+
 
 plane_dist  = []
 for i in range(len(curr)):
